@@ -1,0 +1,27 @@
+' Gambas class file
+
+Inherits PictureBox                                                           'Class is a PictureBox
+siName As Short                                                               'To globalise the name of the skull
+
+Public Sub _New(Name As Short)                                                'Create the skull
+
+siName = Name                                                                 'Add the name to siName
+
+With Me                                                                       'With this skull
+  .H = 35                                                                     'Set the height
+  .W = 35                                                                     'Set the width
+  .Stretch = True                                                             'Streach the picture to fit
+  .Picture = Picture[Application.path &/ "skull.png"]                         'Load the picture
+End With
+
+End
+
+Public Sub DriftAway()                                                        'Call to move the skull
+
+Me.y -= Rand(1, 2)                                                            'Move the skull up the PlayArea
+If Me.y < -15 Then Return                                                     'If the skull has left the PlayArea then return
+If Odd(siName) Then Inc Me.x Else Dec Me.X                                    'If the name of this skull is odd then increase the X value else decrease it
+
+Wait 0.003                                                                    'Wait..
+
+End

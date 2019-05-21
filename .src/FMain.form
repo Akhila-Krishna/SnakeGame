@@ -1,0 +1,136 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,168,105)
+  Icon = Picture["snake.png"]
+  Resizable = False
+  Arrangement = Arrange.Vertical
+  Padding = 5
+  { HBoxToolBar HBox
+    MoveScaled(7,0,159,5)
+    Padding = 2
+    { ToolButtonAbout ToolButton AllToolButtons
+      Name = "ToolButtonAbout"
+      MoveScaled(1,0,4,4)
+      NoTabFocus = True
+      ToolTip = ("Help and about the program ")
+      Action = "Seen"
+      Picture = Picture["icon:/22/info"]
+    }
+    { ToolButtonSettings ToolButton AllToolButtons
+      Name = "ToolButtonSettings"
+      MoveScaled(7,0,4,4)
+      NoTabFocus = True
+      ToolTip = ("Options - Change sound settings")
+      Action = "Seen"
+      Picture = Picture["icon:/22/options"]
+    }
+    { Panel1 Panel
+      MoveScaled(14,0,2,3)
+    }
+    { TextLabelHelp TextLabel
+      MoveScaled(26,0,27,4)
+      Font = Font["Bold,+4"]
+      Background = &HC7FF1F&
+      Expand = True
+      Alignment = Align.Center
+      Border = Border.Sunken
+    }
+    { Panel2 Panel
+      MoveScaled(54,1,1,3)
+    }
+    { Label1 Label
+      MoveScaled(57,1,8,4)
+    }
+    { ToolButtonLevel1 ToolButton AllToolButtons
+      Name = "ToolButtonLevel1"
+      MoveScaled(69,0,4,4)
+      Font = Font["Bold"]
+      NoTabFocus = True
+      ToolTip = ("Start the game on Level 1")
+      Action = "Seen"
+      Text = ("1")
+      Border = True
+    }
+    { ToolButtonLevel2 ToolButton AllToolButtons
+      Name = "ToolButtonLevel2"
+      MoveScaled(73,0,4,4)
+      Font = Font["Bold"]
+      NoTabFocus = True
+      ToolTip = ("Start the game on Level 2")
+      Action = "Seen"
+      Text = ("2")
+      Border = True
+    }
+    { ToolButtonLevel3 ToolButton AllToolButtons
+      Name = "ToolButtonLevel3"
+      MoveScaled(77,0,4,4)
+      Font = Font["Bold"]
+      NoTabFocus = True
+      ToolTip = ("Start the game on Level 3")
+      Action = "Seen"
+      Text = ("3")
+      Border = True
+    }
+    { LabelLevel Label
+      MoveScaled(91,0,20,4)
+      Font = Font["Bold,+2"]
+      Text = ("Level ")
+      Alignment = Align.Center
+      Border = Border.Sunken
+    }
+    { Panel4 Panel
+      MoveScaled(117,1,1,3)
+    }
+    { LabelLives Label
+      MoveScaled(120,0,21,4)
+      Font = Font["Bold,+2"]
+      Text = ("Lives 0")
+      Alignment = Align.Center
+      Border = Border.Sunken
+    }
+    { Panel3 Panel
+      MoveScaled(141,1,1,3)
+    }
+    { LabelScore Label
+      MoveScaled(142,0,16,4)
+      Font = Font["Bold,+2"]
+      Text = ("Score 0")
+      Alignment = Align.Center
+      Border = Border.Sunken
+    }
+  }
+  { PanelPlayArea Panel
+    MoveScaled(7,6,28,7)
+    Background = &H00A000&
+    Expand = True
+    Border = Border.Plain
+  }
+  { HBox1 HBox
+    MoveScaled(7,14,58,3)
+    { LabelVer Label
+      MoveScaled(27,0,27,2)
+      Font = Font["-1"]
+      Expand = True
+      Alignment = Align.BottomRight
+    }
+  }
+  { TimerPlaySpeed #Timer
+    #MoveScaled(42,6)
+  }
+  { TimerHelpDisplay #Timer
+    #MoveScaled(50,6)
+  }
+  { TimerColChanger #Timer
+    #MoveScaled(58,6)
+  }
+}
+
+# Gambas Action File 3.0
+
+{ Actions
+  { Action Seen
+    Text = "3"
+    Picture = "icon:/22/options"
+  }
+}

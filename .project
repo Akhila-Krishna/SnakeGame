@@ -1,0 +1,20 @@
+# Gambas Project File 3.0
+Title=Snake
+Startup=FMain
+Icon=snake.png
+Version=1.0.0
+Component=gb.image
+Component=gb.gui.qt
+Component=gb.form
+Component=gb.desktop
+Component=gb.settings
+Component=gb.sdl2.audio
+Description="A snake game\nComes with sound effects and 3 levels. The more food the snake eats the longer it becomes and the faster it moves, it likes apples!\nHit the sides of the play area or the snake's tail and you DIE!\nTested on Linux Mint with Gambas 3.12.2 and on the Raspberry Pi with Gambas 3.9.1"
+Authors="Charlie Ogier 2019"
+Environment="GB_GUI=gb.qt4"
+TabSize=2
+Language=en_US
+CreateShortcut=1
+Vendor=cogier
+Packager=1
+Tags=Game

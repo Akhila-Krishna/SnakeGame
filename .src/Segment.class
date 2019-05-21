@@ -1,0 +1,24 @@
+' Gambas class file
+
+'This class is not needed as it could all be done with a PictureBox but this is where we are!
+
+Inherits PictureBox                                                           'Class inherits a PictureBox
+
+Public Sub _new(siX As Short, siY As Short, siCount As Short)                 'During creation add X,Y and counter values
+
+With Me                                                                       'With me..
+  .Height = FMain.siSegLen                                                    'Set the height
+  .Width = FMain.siSegLen                                                     'Set the width
+  .x = siX                                                                    'Set the X value
+  .y = siY                                                                    'Set the Y value
+  .Stretch = True                                                             'Streach the picture to fit the PictureBox
+End With
+
+If siCount = 0 Then 
+  Me.Picture = Picture[Application.path &/ "headl.png"]                       'If this is the 'Head' 'Segment' then add a head image
+Else
+  Me.Picture = Picture[Application.path &/ "skin0.png"]                       'If this is not the 'Head' 'Segment' then add a skin image
+End If
+
+End
+

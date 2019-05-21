@@ -1,0 +1,32 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,33,12)
+  Text = ("Options")
+  SkipTaskbar = True
+  Arrangement = Arrange.Vertical
+  Padding = 5
+  { HBox1 HBox
+    MoveScaled(1,1,29,4)
+    { CheckBoxSound CheckBox
+      MoveScaled(2,0,24,4)
+      Text = ("Play sounds")
+    }
+  }
+  { Panel2 Panel
+    MoveScaled(10,5,5,2)
+    Expand = True
+  }
+  { HBox2 HBox
+    MoveScaled(1,7,29,4)
+    { Panel1 Panel
+      MoveScaled(1,1,6,3)
+      Expand = True
+    }
+    { ButtonDone Button
+      MoveScaled(9,0,16,4)
+      Text = Shortcut(("Done"), "D")
+      Picture = Picture["icon:/22/apply"]
+    }
+  }
+}

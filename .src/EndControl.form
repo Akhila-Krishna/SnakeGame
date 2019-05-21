@@ -1,0 +1,56 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,81,24)
+  Background = Color.Black
+  Border = False
+  SkipTaskbar = True
+  Arrangement = Arrange.Vertical
+  Padding = 5
+  { TextLabel1 TextLabel
+    MoveScaled(4,2,24,9)
+    Font = Font["Bold,+14"]
+    Foreground = &HFFFF00&
+    Expand = True
+    Alignment = Align.Center
+  }
+  { Panel1 HBox
+    MoveScaled(1,16,80,8)
+    { ButtonLevel1 Button AllButtons
+      Name = "ButtonLevel1"
+      MoveScaled(0,0,16,8)
+      Text = Shortcut(("Play\nLevel1"), "1")
+    }
+    { Panel3 Panel
+      MoveScaled(16,1,1,6)
+    }
+    { ButtonLevel2 Button AllButtons
+      Name = "ButtonLevel2"
+      MoveScaled(20,0,17,8)
+      Text = Shortcut(("Play\nLevel2"), "2")
+    }
+    { Panel4 Panel
+      MoveScaled(37,1,1,6)
+    }
+    { ButtonLevel3 Button AllButtons
+      Name = "ButtonLevel3"
+      MoveScaled(40,0,17,8)
+      Text = Shortcut(("Play\nLevel3"), "3")
+    }
+    { Panel2 Panel
+      MoveScaled(58,2,4,4)
+      Expand = True
+    }
+    { ButtonClose Button AllButtons
+      Name = "ButtonClose"
+      MoveScaled(63,0,16,8)
+      Text = Shortcut(("Close"), "C")
+      Picture = Picture["icon:/huge/cancel"]
+    }
+  }
+  { Timer1 #Timer
+    #MoveScaled(26,8)
+    Enabled = True
+    Delay = 5
+  }
+}

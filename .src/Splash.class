@@ -1,0 +1,37 @@
+' Gambas class file
+
+siMiddle As Short                                                             'To store the screens mid point
+
+Public Sub Form_Open()                                                        'Form opens..
+
+Me.y = (Desktop.Height / 2) - (Me.Height / 2)                                 'Set the Y value
+Me.x = Desktop.Width                                                          'Set the X value
+
+If Settings["sound", True] = True Then                                        'If the sound has not been disabled then..
+  Music.Load(Application.path &/ "rattle.mp3")                                'Load the snake rattling sound
+  Music.play                                                                  'Play the sound
+End If
+
+siMiddle = (Desktop.Width / 2) - (Me.Width / 2)                               'Work out and store the screen midpoint
+Me.Show                                                                       'Show the form (Needed on the Raspberry Pi)
+
+End
+
+Public Sub Timer1_Timer()                                                     'Timer
+
+Me.X -= 2                                                                     'Move the form 2 to the left
+If Me.X <= siMiddle Then                                                      'If the form is at the midpoint then..
+  Timer1.Stop                                                                 'Stop the timer
+  Wait 1.0                                                                    'Wait a second
+  Music.stop                                                                  'Stop the sound
+  Try Me.close                                                                'Close the form
+End If
+
+End
+
+Public Sub Form_Enter()                                                       'If the mouse enters the form..
+
+Music.stop                                                                    'Stop the sound
+Me.Close                                                                      'Close the form
+
+End

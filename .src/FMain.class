@@ -1,0 +1,447 @@
+' Gambas class file
+
+sDir As String                                                                'Snake direction
+hSeg As Segment                                                               'A snake 'Segment'
+siLives As Short                                                              'Lives in the game
+siScore As Short                                                              'Score
+bSwitch As Boolean                                                            'Alters background colour change direction for the 'Help' message
+sDirNoGo As String                                                            'Direction you can't go
+sLastDir As String                                                            'Last direction
+bHitMode As Boolean                                                           'Used to stop key presses during the Hit routine
+bNotRunning As Boolean                                                        'To establish if the program is running or not
+siColourChange As Short                                                       'RGB Colour values
+oFood As New PictureBox[]                                                     'PictureBox array for the 'Food'
+
+Public sText As String                                                        'Stores text for EndControl form
+Public bEndReturn As Boolean                                                  'Stores the answer to button presses in the EndControl form
+Public siLevel As Short = 20                                                  'Level value
+Public hSegs As New Segment[]                                                 'Snake 'Segments'
+Public Const siSegLen As Short = 15                                           'Size of snake 'Segments'
+Public Const siMaxLives As Short = 3                                          'Amount of lives in the game
+Public siLevelArray As Short[] = [0, 0, 0]
+
+Public Sub Form_Open()                                                        'Form opens..
+
+LabelVer.Text = "Version 1.0.0"                                               'Version label
+Application.MainWindow = Me                                                   'All windows close if this one does
+Me.h = 672                                                                    'Hight of form
+Me.W = 1180                                                                   'Width of form
+Splash.ShowModal                                                              'Show the 'Splash' screen
+Me.Show                                                                       'Show this form
+Me.Center                                                                     'Centre the form
+Start                                                                         'Start..
+
+End
+
+Public Sub Start()                                                            'Start routine
+Dim siLev As Short[] = [0, 20, 30, 40]
+
+LabelLevel.Text = "Level " & siLev.Find(siLevel)                              'Display the level
+siLives = siMaxLives - 1                                                      'Setup amount of lives
+LabelLives.Text = "Lives Left = " & Str(siLives)                              'Display lives left
+PanelPlayArea.Children.Clear                                                  'Clear everthing from the PlayArea
+hSegs.Clear                                                                   'Clear the hSegs array
+sDir = ""                                                                     'Clear travel direction
+sDirNoGo = ""                                                                 'Clear no go direction
+oFood.Clear                                                                   'Clear food array
+CreateFood                                                                    'Create the 'Food'
+CreateSegments                                                                'Create the 'Segments'
+TimerColChanger.Delay = 5                                                     'Set the colour changer timer delay
+TimerColChanger.Start                                                         'Start the colour changer timer 
+TimerPlaySpeed.Delay = 100                                                    'Set the snake speed
+TimerPlaySpeed.Start                                                          'Start the snake speed timer
+TimerHelpDisplay.Start                                                        'Start the 'Help' display timer
+TextLabelHelp.Text = "Use the arrow keys to start and move, space bar to pause" 'Set 'Help' text
+siScore = 0                                                                   'Reset score
+LabelScore.text = "Score 0"                                                   'Reset score label
+Action["Seen"].Enabled = True                                                 'Enable the Level buttons
+
+End
+
+Public Sub CreateFood()                                                       'Create 'Food' for the snake..
+Dim hFood As PictureBox                                                       'Picturebox for the 'Food'
+Dim siLoop As Short                                                           'Loop variable
+
+For siLoop = 1 To siLevel                                                     'Loop depending on the level
+  hFood = New PictureBox(PanelPlayArea)                                       'Create a PictureBox and put it in the PlayArea
+  With hFood                                                                  'With the PictureBox
+    .H = 30                                                                   'Set the height
+    .W = 30                                                                   'Set the width
+    .X = Rand(0, (PanelPlayArea.Width - 30) / siSegLen) * siSegLen            'Randomly create a 'X' value
+    .Y = Rand(0, (PanelPlayArea.Height - 30) / siSegLen) * siSegLen           'Randomly create a 'Y' value
+    .Stretch = True                                                           'Set streach to True
+    .Picture = Picture.Load(Application.Path &/ "apple.png")                  'Add an apple to the PictureBox
+  End With                                                                    'End With
+  oFood.Add(hFood)                                                            'Add the newly created 'apple' to the 'Food' array
+  Wait 0.1                                                                    'Wait, to slow down the display 
+Next
+
+Catch                                                                         'Stops a crash if the user closes the program in the middle of this routine
+
+End
+
+Public Sub Hit()                                                              'So you've hit something....DIE!
+Dim siLoop, siDir As Short                                                    'Counters
+Dim sSeg As Segment                                                           'A 'Segment'
+Dim bBite As Boolean = True                                                   'Was this 'Hit' a tail bite, set to True?
+Dim siX1 As Short = Me.x - 15                                                 'Variable to 'shake' the form (This way works better on the Raspberry Pi)
+Dim siX2 As Short = Me.x + 15                                                 'Variable to 'shake' the form (This way works better on the Raspberry Pi)
+Dim siY1 As Short = Me.y - 15                                                 'Variable to 'shake' the form (This way works better on the Raspberry Pi)
+Dim siY2 As Short = Me.y + 15                                                 'Variable to 'shake' the form (This way works better on the Raspberry Pi)
+
+bHitMode = True                                                               'Stop the key presses being triggered
+TimerPlaySpeed.Stop                                                           'Stop the game..
+
+If hSegs[0].Y < 0 Then                                                        'Have you hit the Top of the form?
+   bBite = False                                                              'If so there is no tail biting, set to False 
+   hSegs[0].Y = 0                                                             'Make sure you can see the 1st 'Segment'
+  For siLoop = 1 To hSegs.Max                                                 'Loop through the remaining 'Segments'
+    hSegs[siLoop].Y -= Rand(0, 30)                                            'Move 'Segment' on the 'Y' plain a negative random amount
+    sDir = Rand(0, 1)                                                         'Shall we move the 'Segment' left or right?
+    If sDir Then hSegs[siLoop].X -= Rand(0, 30)                               'If left then the 'Segment' left a random amount
+    If Not sDir Then hSegs[siLoop].X += Rand(0, 30)                           'If right then the 'Segment' right a random amount
+  Next
+Endif
+
+If hSegs[0].Y > PanelPlayArea.Height Then                                     'Have you hit the Bottom of the form?
+   bBite = False                                                              'If so there is no tail biting, set to False
+   hSegs[0].Y = PanelPlayArea.Height - siSegLen                               'Make sure you can see the 1st 'Segment'
+  For siLoop = 1 To hSegs.Max                                                 'Loop through the remaining 'Segments'
+    hSegs[siLoop].Y -= Rand(0, 30)                                            'Move 'Segment' on the 'Y' plain a negative random amount
+    sDir = Rand(0, 1)                                                         'Shall we move the 'Segment' left or right?
+    If sDir Then hSegs[siLoop].X -= Rand(0, 30)                               'If left then move the 'Segment' left a random amount
+    If Not sDir Then hSegs[siLoop].X += Rand(0, 30)                           'If right then move  the 'Segment' right a random amount
+  Next
+Endif
+
+If hSegs[0].X < 0 Then                                                        'Have you hit the Left of the form?
+   bBite = False                                                              'If so there is no tail biting, set to False
+   hSegs[0].X = 0                                                             'Make sure you can see the 1st 'Segment'
+  For siLoop = 1 To hSegs.Max                                                 'Loop through the remaining 'Segments'
+    hSegs[siLoop].X -= Rand(0, 30)                                            'Move 'Segment' on the 'X' plain a negative random amount
+    sDir = Rand(0, 1)                                                         'Shall we move the 'Segment' up or down?
+    If sDir Then hSegs[siLoop].Y -= Rand(0, 30)                               'If up then move the 'Segment' up a random amount
+    If Not sDir Then hSegs[siLoop].Y += Rand(0, 30)                           'If down then move the 'Segment' down a random amount
+  Next
+Endif
+
+If hSegs[0].X > PanelPlayArea.Width Then                                      'Have you hit the Right of the form?
+   bBite = False                                                              'If so there is no tail biting, set to False
+   hSegs[0].X = PanelPlayArea.Width - siSegLen                                'Make sure you can see the 1st 'Segment'
+  For siLoop = 1 To hSegs.Max                                                 'Loop through the remaining 'Segments'
+    hSegs[siLoop].X -= Rand(0, 30)                                            'Move 'Segment' on the 'X' plain a negative random amount
+    sDir = Rand(0, 1)                                                         'Shall we move the 'Segment' up or down?
+    If sDir Then hSegs[siLoop].Y -= Rand(0, 30)                               'If up then move the 'Segment' up a random amount
+    If Not sDir Then hSegs[siLoop].Y += Rand(0, 30)                           'If down then move the 'Segment' down a random amount
+  Next
+Endif
+
+If bBite Then                                                                 'If you bit your own tail then..
+  For siLoop = 0 To hSegs.Max                                                 'Loop through all the 'Segments'
+    sDir = Rand(0, 1)                                                         'Shall we move the 'Segment' left or right?
+    If sDir Then hSegs[siLoop].X -= Rand(0, 15)                               'If left then move the 'Segment' a random amount
+    If Not sDir Then hSegs[siLoop].X += Rand(0, 15)                           'If right then move the 'Segment' a random amount
+    sDir = Rand(0, 1)                                                         'Shall we move the 'Segment' up or down?
+    If sDir Then hSegs[siLoop].Y -= Rand(0, 15)                               'If up then move the 'Segment' a random amount
+    If Not sDir Then hSegs[siLoop].Y += Rand(0, 15)                           'If down then move the 'Segment' a random amount
+  Next
+Endif
+
+PlaySounds("smash")                                                           'Play 'smash'
+
+For siLoop = 1 To 50                                                          'Loop 50 times - This 'shakes' the whole form
+  If Odd(siLoop) Then                                                         'If siLoop is odd then 
+    Me.x = siX1                                                               'Move form right 15
+    Me.Y = siY1                                                               'Move form up 15
+  Else                                                                        'Else siLoop is even
+    Me.x = siX2                                                               'Move form left 15
+    Me.Y = siY2                                                               'Move form down 15
+  End If  
+  Wait 0.01                                                                   'Wait so the changes are displyed
+Next
+
+FloatThemSkulls
+
+siLoop = 0                                                                    'Reset siLoop
+
+Dec siLives                                                                   'Reduce the amount of lives
+LabelLives.Text = "Lives Left = " & Str(siLives)                              'Display the lives left
+
+If siLives = -1 Then                                                          'If lives left = -1 (end of game)
+  LabelLives.Text = ""                                                        'Clear the label
+  sText = "YOU FAILED!"                                                       'Set the sText string
+  PlaySounds("failed")                                                        'Play 'failed'
+  EndControl.ShowModal                                                        'Show the EndControl form
+  Action["Seen"].Enabled = True                                               'Enable the Level buttons
+  If bEndReturn Then                                                          'If the user asked to play again then.. 
+    Start                                                                     'Restart the game
+  Else                                                                        'Else..
+    Me.close                                                                  'Close the form
+  End If
+Else
+  For Each sSeg In hSegs                                                      'For each 'Segment'..
+    sSeg.Delete                                                               'Delete it
+    Inc siLoop                                                                'Increase siLoop
+    If siLoop < 10 Then Wait 0.2                                              'Add a delay 
+  Next
+  siDir = hSegs.Max                                                           'Store the amount of 'Segments' on the snake
+  hSegs.Clear                                                                 'Clear the 'Segment' array
+  CreateSegments(siDir)                                                       'Recreate the snake with the same amout of 'Segments'
+  sDirNoGo = ""                                                               'Clear string
+  sDir = ""                                                                   'Clear string
+  TimerPlaySpeed.Start                                                        'Start the timer
+End If
+
+bHitMode = False                                                              'Reinstate key presses
+
+End
+
+Public Sub FloatThemSkulls()                                                  'So you're dead!
+Dim hSkull As Skull                                                           'To create skulls
+Dim siCount As Short                                                          'Counter
+Dim hSkulls As New Skull[]                                                    'Array of skulls
+Dim bGone As Boolean                                                          'Used to see it the skulls have left the PlayArea
+
+For siCount = 0 To hSegs.max Step hSegs.max / 3                               'To find the begining, middle and end of the snake tail
+  hSkull = New Skull(PanelPlayArea, siCount)                                  'Create a skull and put in the in the Playarea
+  hSkull.X = hSegs[siCount].X                                                 'Give it an X value
+  hSkull.Y = hSegs[sicount].Y                                                 'Give it an Y value
+  hSkulls.Add(hSkull)                                                         'Add it to the array
+Next
+
+Repeat                                                                        'Repeat
+  bGone = True                                                                'Set bGone as True
+  For siCount = 0 To hSkulls.Max                                              'Loop through the skulls
+    hSkulls[siCount].DriftAway                                                'Run the skulls own DriftAway routine
+    If hSkulls[siCount].y > -35 Then bGone = False                            'If the skull is still on the screen then set bGone to False
+  Next
+Until bGone = True                                                            'Run untill all the skulls are off the PlayArea
+
+Catch                                                                         'Stops a crash if the user closes the program in the middle of this routine
+
+End
+
+Public Sub CreateSegments(Optional siExtraSegs As Short)                      'Creates the 'Segments'..
+Dim siX, siCount As Short                                                     'Counters
+
+For siX = 510 To 720 Step siSegLen                                            'Creates the 1st 15 'Segments'
+  hSeg = New Segment(PanelPlayArea, siX, 210, siCount)                        'Create a 'Segment' pasing 'X' and 'Y' positions and a count
+  hSegs.Add(hSeg)                                                             'Add it to hSegs array
+  Inc siCount                                                                 'Increase siCount
+Next
+
+If siExtraSegs > 15 Then                                                      'If there are extra 'Segements' to add then..
+  For siCount = 15 To siExtraSegs                                             'Loop
+    AddNewSegment(1)                                                          'Add a new 'Segment'
+  Next
+Endif
+
+Catch                                                                         'Stops a crash if the user closes the program in the middle of this routine
+
+End
+
+Public Sub CheckForTailBiting() As Boolean                                    'To check for 'Tail biting'..
+Dim siCount As Short                                                          'Counter
+
+For siCount = 3 To hSegs.Max                                                  'Start at the 4th 'Segment'
+  If hSegs[0].X = hSegs[siCount].X And If hSegs[0].Y = hSegs[siCount].Y Then  'If the 1st 'Segment' hits any of the other 'Segments' then..
+    Return True                                                               'Return True
+  End If
+Next
+
+End
+
+Public Sub TimerPlaySpeed_Timer()                                             'Main timer, controls the speed of the snake
+Dim siCount As Short                                                          'Counter
+
+Me.Center                                                                     'Keep the form centred
+If sDir = "" Then                                                             'If there is no direction (the game has not started) then
+  bNotRunning = True                                                          'Set value to True
+  Return                                                                      'Get out of here..
+Endif
+Action["Seen"].Enabled = False                                                'Disable the Level buttons
+bNotRunning = False                                                           'Set the value to False
+
+hSegs.Add(hSegs.pop(), 1)                                                     'Move the last 'Segment' of the tail and put it in 2nd place in the array
+hSegs[1].X = hSegs[0].X                                                       'Set the 'X' value to that of the snakes head
+hSegs[1].Y = hSegs[0].Y                                                       'Set the 'Y' value to that of the snakes head
+
+If sDir = "L" Then                                                                      'If the snake is moving left then.. 
+  hSegs[0].X -= siSegLen                                                                'Move the head left
+  If sDir <> sLastDir Then hSegs[0].Picture = Picture[Application.path &/ "headl.png"]  'If the direction has changed then change the picture on the snake's head
+End If
+
+If sDir = "U" Then                                                                      'If the snake is moving up then.. 
+  hSegs[0].Y -= siSegLen                                                                'Move the head up
+  If sDir <> sLastDir Then hSegs[0].Picture = Picture[Application.path &/ "headu.png"]  'If the direction has changed then change the picture on the snake's head
+End If
+
+If sDir = "R" Then                                                                      'If the snake is moving right then.. 
+  hSegs[0].X += siSegLen                                                                'Move the head right
+  If sDir <> sLastDir Then hSegs[0].Picture = Picture[Application.path &/ "headr.png"]  'If the direction has changed then change the picture on the snake's head
+End If
+
+If sDir = "D" Then                                                                      'If the snake is moving down then.. 
+  hSegs[0].Y += siSegLen                                                                'Move the head down
+  If sDir <> sLastDir Then hSegs[0].Picture = Picture[Application.path &/ "headd.png"]  'If the direction has changed then change the picture on the snake's head
+End If
+
+sLastDir = sDir                                                                         'Set the slastDir to the same a sDir 
+
+For siCount = 0 To oFood.Max                                                  'Loop to see if the snake has hit the 'Food'
+  If oFood[siCount].X < hSegs[0].X + hSegs[0].W And If oFood[siCount].X + oFood[siCount].W > hSegs[0].X And If oFood[siCount].Y < hSegs[0].Y + hSegs[0].H And If oFood[siCount].Y + oFood[siCount].H > hSegs[0].Y Then
+                                                                              'This is modified Java code from https://stackoverflow.com/questions/31022269/collision-detection-between-two-rectangles-in-java
+                                                                              'The line above detects a collision between the head of the snake and 'Food' and if it has then.. 
+    oFood[siCount].Delete                                                     'Delete the 'Food' from the Playarea
+    oFood.Extract(siCount)                                                    'Delete the 'Food' from the array
+    Inc siScore                                                               'Increase the score
+    LabelScore.Text = "Score " & Str(siScore)                                 'Alter the score display
+    TimerPlaySpeed.Delay -= 2                                                 'Speed up the snake
+    AddNewSegment(2)                                                          'Add 2 more 'Segments' to the snake
+    PlaySounds("bite")                                                        'Play 'bite'
+    Break                                                                     'Jump out of loop
+  Endif
+Next
+
+If siScore = siLevel Then EndGame                                             'If the score reaches the level score then stop the game
+
+If hSegs[0].X < 0 Or If hSegs[0].X > PanelPlayArea.Width - 15 Then Hit        'If you hit the left or right of the Playarea then you DIE!
+If hSegs[0].Y < 0 Or If hSegs[0].Y > PanelPlayArea.Height - 15 Then Hit       'If you hit the top or bottom of the Playarea then you DIE!
+
+If CheckForTailBiting() Then Hit                                              'Go and check for 'tail biting' and if so you DIE!
+
+Catch                                                                         'Stops a crash if the user closes the program in the middle of this routine
+
+End
+
+Public Sub EndGame()                                                          'End of game when you win..
+Dim silev As Short[] = [20, 30, 40]
+
+TimerPlaySpeed.Stop                                                           'Stop the timer
+siLevelArray[siLev.Find(siLevel)] = 1
+PlaySounds("applause")                                                        'Play 'applause'
+sText = "Congratulations!"                                                    'Set the text
+EndControl.ShowModal                                                          'Load the EndControl form
+Action["Seen"].Enabled = True                                                 'Enable the Level buttons
+If bEndReturn Then                                                            'Depending on the button selected on the EndControl form..
+  Start                                                                       'Restart the program
+Else                                                                          'Else..
+  Me.close                                                                    'Close the program
+End If
+
+End
+
+Public Sub AddNewSegment(siCount As Short)                                    'To add extra 'Segments' to the snake
+Dim siX As Short = hSegs[hSegs.Max].X                                         'Get the last 'Segment' X value and store
+Dim siY As Short = hSegs[hSegs.Max].Y                                         'Get the last 'Segment' Y value and store
+Dim siX1 As Short = hSegs[hSegs.Max - 1].X                                    'Get the penultimate 'Segment' X value and store
+Dim siY1 As Short = hSegs[hSegs.Max - 1].Y                                    'Get the penultimate 'Segment' Y value and store
+Dim siNewX As Short = siX                                                     'Stores a X value for the new 'Segment'
+Dim siNewY As Short = siY                                                     'Stores a Y value for the new 'Segment'
+Dim siLoop As Short                                                           'Loop counter
+
+For siLoop = 1 To siCount                                                     'Loop for each 'Segement' required
+  If siX = siX1 Then                                                          'If the snake is vertical then..
+    If siY > siY1 Then siNewY = siY + siSegLen Else siNewY = siY - siSegLen   'Work out which way the snake is going and set a new Y value
+  Endif
+  
+  If siY = siY1 Then                                                          'If the snake is horizontal then..
+    If siX > siX1 Then siNewX = siX + siSegLen Else siNewX = siX - siSegLen   'Work out which way the snnke is going and set a new X value
+  Endif
+  
+  hSeg = New Segment(PanelPlayArea, siNewX, siNewY, hSegs.Count) As "AllSegs" 'Add a new 'Segment'
+  hSegs.Add(hSeg)                                                             'Add the 'Segment' to the array
+Next
+
+End
+
+Public Sub Form_KeyPress()                                                    'If the user presses a key..
+
+If bHitMode Then Return                                                       'If set get out of here
+sDirNoGo = sDir                                                               'Set sDirNoGo to the same direction as sDir
+If Not sDirNoGo Then sDirNoGo = "L"                                           'If the game has not started get out of here
+
+If Key.Code = Key.Space Then                                                  'If the Space key was pressed then..
+   TimerPlaySpeed.Enabled = Not TimerPlaySpeed.Enabled                        'Stop the timer if running or start it if not.
+   If TimerPlaySpeed.Enabled = False Then                                     'If the timer is not running then..
+     TextLabelHelp.Text = "Game paused - Press space bar to restart"          'Add a message
+     TimerColChanger.Start                                                    'Start the display timer
+   Else                                                                       'Else the game is back on..
+    TextLabelHelp.Text = ""                                                   'Clear the message
+    TimerColChanger.Stop                                                      'Stop the display timer
+    TextLabelHelp.Background = Color.Default                                  'Reset the background colour
+    TextLabelHelp.Foreground = Color.Default                                  'Reset the foreground colour
+  End If
+End If
+If TimerPlaySpeed.Enabled = False Then Return                                 'If the game is paused get out of here
+If Key.Code = Key.Up And sDirNoGo <> "D" Then sDir = "U"                      'If the user presses Up and the snake is not going Down the Up it is
+If Key.Code = Key.Down And sDirNoGo <> "U" Then sDir = "D"                    'If the user presses Down and the snake is not going Up the Down it is
+If Key.Code = Key.Left And sDirNoGo <> "R" Then sDir = "L"                    'If the user presses Left and the snake is not going Right the Left it is
+If Key.Code = Key.Right And sDirNoGo <> "L" Then sDir = "R"                   'If the user presses Right and the snake is not going Left the Right it is
+
+End
+
+Public Sub TimerHelpDisplay_Timer()                                           'Display timer
+
+If sDirNoGo <> "" Then                                                        'If sDirNoGo has a value then.. 
+  TextLabelHelp.Background = Color.Default                                    'Reset message background colour
+  TextLabelHelp.Foreground = Color.Default                                    'Reset message foreground colour
+  TextLabelHelp.Text = ""                                                     'Clear the message
+  TimerColChanger.Stop                                                        'Stop the colour changing timer
+  TimerHelpDisplay.Stop                                                       'Stop this timer
+End If
+
+End
+
+Public Sub PlaySounds(sName As String)                                        'To play sounds
+
+If Settings["sound", True] = False Then Return                                'If the sound has been disabled then get out of here
+
+Music.Load(Application.Path &/ sName & ".mp3")                                'Load the sound to play
+Music.Play                                                                    'Play the sound
+
+End
+
+Public Sub AllToolButtons_Click()                                             'If a toolbutton is clicked..
+Dim siLev As Short[] = [0, 20, 30, 40]                                        'Set up amout of 'Food' to put out
+
+If Last.name Ends "About" Then About.ShowModal                                'If the About toolbutton is clicked then open the About form
+If Last.name Ends "Settings" Then Options.ShowModal                           'If the Options toolbutton is clicked then open the Options form
+
+If Last.Name Begins "ToolButtonLevel" Then                                    'If a Level button is clicked then..
+  siLevel = siLev[Val(Last.Text)]                                             'Set the level value depending on the level selected
+  LabelLevel.Text = "Level " & Str(Val(Last.Text))                            'Display the selected level
+  Action["Seen"].Enabled = False                                              'Disable the Level buttons
+  Start                                                                       'Restart the program
+  Action["Seen"].Enabled = True                                               'Enable the Level buttons
+End If 
+
+End
+
+Public Sub AllToolButtons_Enter()                                             'If the mouse passes over a ToolButton..
+
+Me.title = Last.tooltip                                                       'Show the tooltip in the form title
+
+End
+
+Public Sub AllToolButtons_Leave()                                             'If the mouse moves away from a ToolButton..
+
+Me.title = "Snake"                                                            'Restore the program name
+
+End
+
+Public Sub TimerColChanger_Timer()                                            'Changes the colours of the message..
+
+If siColourChange > 250 Then bSwitch = False                                  'If the value is too high then set to reverse the direction
+If siColourChange < 10 Then bSwitch = True                                    'If the value is too low then set to reverse the direction
+If bSwitch Then                                                               'Depending on the direction..
+  Inc siColourChange                                                          'Increase the value
+Else                                                                          'Else
+  Dec siColourChange                                                          'Decrease the value
+End If
+
+TextLabelHelp.Background = Color.RGB(siColourChange, 200, siColourChange)     'Set the backgroud colour of the message
+TextLabelHelp.Foreground = Color.RGB(200, siColourChange, siColourChange)     'Set the foregroud colour of the message
+
+End
+

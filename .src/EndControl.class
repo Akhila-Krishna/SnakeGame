@@ -1,0 +1,49 @@
+' Gambas class file
+
+siAdd As Short                                                                'To control this forms direction
+
+Public Sub Form_Open()                                                        'Form opens..
+Dim hButtons As Button[] = [ButtonLevel1, ButtonLevel2, ButtonLevel3]         'An array of the Level buttons
+Dim siLoop As Short                                                           'Counter
+
+TextLabel1.Text = FMain.sText                                                 'Fill the label with text
+
+For siLoop = 0 To 2                                                           'Loop through the FMain.siLevelArray
+  If FMain.siLevelArray[siLoop] = 1 Then                                      'If the Level has been completed then..
+  hButtons[siloop].Picture = Picture["icon:/huge/apply"]                      'Add a huge 'Tick' to the relevant button
+  End If
+Next
+
+Me.Y = Desktop.Height                                                         'Set the Y position of this form
+Me.X = (Desktop.Width / 2) - (Me.Width / 2)                                   'Set the X position of this form
+
+End
+
+Public Sub Timer1_Timer()                                                     'Timer that controls the 'arrival' of this form
+
+If siAdd = 0 Then                                                             'If siAdd = 0 then.. 
+  Me.Y -= 5                                                                   'Reduce the Y position of this form
+  If Me.Y <= 200 Then                                                         'If the Y position is less than 200 then..
+    Inc siAdd                                                                 'Increase siAdd
+  End If
+Else                                                                          'If siAdd does not = 0 then..(Create a slight 'bounce')
+  Inc siAdd                                                                   'Increase siAdd
+  Me.Y += 2                                                                   'Add 2 to the Y position
+  If siAdd > 10 Then Timer1.Stop                                              'Is siAdd equal to or greater than 10 then stop the timer
+End If 
+
+End
+
+Public Sub AllButtons_Click()                                                 'When a button is clicked..
+Dim siLev As Short[] = [0, 20, 30, 40]                                        'An array of the Level values
+
+If InStr(Last.Name, "Level") Then                                             'If it's a Level button then..
+  FMain.bEndReturn = True                                                     'Change the value of FMain.bEndReturn
+  FMain.siLevel = siLev[Right(Last.Name)]                                     'Set the Level requested
+  Me.Close                                                                    'Close the form
+Else                                                                          'Else
+  FMain.bEndReturn = False                                                    'Change the value of FMain.bEndReturn
+  Me.Close                                                                    'Close the form
+End If
+
+End

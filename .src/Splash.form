@@ -1,0 +1,18 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,39.2857,39.2857)
+  Border = False
+  Arrangement = Arrange.Vertical
+  { PictureBox1 PictureBox
+    MoveScaled(16,17,16,16)
+    Expand = True
+    Picture = Picture["snake.png"]
+    Stretch = True
+  }
+  { Timer1 #Timer
+    #MoveScaled(21,6)
+    Enabled = True
+    Delay = 10
+  }
+}

@@ -1,0 +1,15 @@
+' Gambas class file
+
+
+Public Sub Form_Open()                                                        'Form opens..
+
+CheckBoxSound.Value = Settings["sound", True]                                 'Get the saved value of the 'sound' setting
+
+End
+
+Public Sub ButtonDone_Click()                                                 'The button is clicked
+
+Settings["sound"] = CheckBoxSound.Value                                       'Save the 'sound' setting
+Me.Close                                                                      'Close the form
+
+End

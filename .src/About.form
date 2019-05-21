@@ -1,0 +1,82 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,109,74)
+  SkipTaskbar = True
+  Arrangement = Arrange.Vertical
+  Padding = 5
+  { Panel1 Panel
+    MoveScaled(-1,1,76,69)
+    Expand = True
+    Arrangement = Arrange.Vertical
+    Padding = 5
+    Border = Border.Plain
+    { TextLabelAbout TextLabel
+      MoveScaled(1,1,73,54)
+      Background = Color.White
+      Expand = True
+      Text = ("Written by Charlie Ogier with help from Matt Collins.<br>\nBugs or comments to bugs@cogier.com.<p>\n\nThe idea is to move around using the arrow keys and 'eat' all the apples. The snake gets longer and faster the more you feed it. <br>Hit the edge of the play area and you will <b>DIE!</b><br>\nEat the sanke's own tail and you will <b>DIE!</b><br>\nYou can stop the 'Splash' screen by passing the mouse over it.<br>\nUse the arrow keys to start and change direction.<br>\nYou can press the 'Space Bar' to pause the game.<p>\n\nSound clips from soundbible.com.<br>\nSome clips licenced under Attr-Noncommercial 3.0.<p>\n\nApple picture from all-free-download.com.<br>\nLicence: Free for commercial with attribution.<p>\n\nCopyright (C) Charlie Ogier 2019.<p>\n\nThis program is free software; you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation; either version 2 of the License, or\n(at your option) any later version.<p>\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.<p>\n\nThe GNU General Public License is available from: -\nFree Software\nFoundation, Inc., 51 Franklin St, Fifth Floor, \nBoston, MA  02110-1301  USA<p>")
+    }
+    { Panel2 Panel
+      MoveScaled(13,56,19,0)
+      Background = Color.Black
+    }
+    { HBox1 HBox
+      MoveScaled(0,58,74,4)
+      { URLLabel1 URLLabel
+        MoveScaled(1,0,24,4)
+        Expand = True
+        Link = "http://soundbible.com"
+        Text = ("soundbible.com")
+        Alignment = Align.Center
+      }
+      { URLLabel2 URLLabel
+        MoveScaled(25,0,24,4)
+        Expand = True
+        Link = "https://creativecommons.org/licenses/by-nc/3.0/us/"
+        Text = ("Attr-Noncommercial 3.0")
+        Alignment = Align.Center
+      }
+      { URLLabel5 URLLabel
+        MoveScaled(50,0,24,4)
+        Expand = True
+        Link = "https://all-free-download.com/free-vector/download/red-apple_310910.html"
+        Text = ("all-free-download.com")
+        Alignment = Align.Center
+      }
+    }
+    { Panel3 Panel
+      MoveScaled(6,63,19,0)
+      Background = Color.Black
+    }
+    { HBox2 HBox
+      MoveScaled(4,64,62,4)
+      { URLLabel3 URLLabel
+        MoveScaled(1,0,24,4)
+        Expand = True
+        Link = "https://forum.gambas.one/"
+        Text = ("Gambas.One forum")
+        Alignment = Align.Center
+      }
+      { URLLabel4 URLLabel
+        MoveScaled(37,0,24,4)
+        Expand = True
+        Link = "http://wordpress.gambas.one/2016/10/22/snippets-collection-1/"
+        Text = ("Gambas tips")
+        Alignment = Align.Center
+      }
+    }
+  }
+  { HBox3 HBox
+    MoveScaled(0,70,23,4)
+    { Panel4 Panel
+      MoveScaled(2,1,4,2)
+      Expand = True
+    }
+    { ButtonDone Button
+      MoveScaled(7,0,16,4)
+      Text = Shortcut(("Done"), "D")
+      Picture = Picture["icon:/22/ok"]
+    }
+  }
+}
